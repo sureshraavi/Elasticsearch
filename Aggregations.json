@@ -1,0 +1,127 @@
+"_terms aggregation on my-field"
+GET /my-index-000001/_search
+{
+  "aggs": {
+    "my-agg-name": {
+      "terms": {
+        "field": "my-field"
+      }
+    }
+  }
+}
+
+"_Change an aggregation's scope"
+GET /my-index-000001/_search
+{
+  "query": {
+    "range": {
+      "@timestamp": {
+        "gte": "now-1d/d",
+        "lt": "now/d"
+      }
+    }
+  },
+  "aggs": {
+    "my-agg-name": {
+      "terms": {
+        "field": "my-field"
+      }
+    }
+  }
+}
+
+"_Return only aggregation results"
+GET /my-index-000001/_search
+{
+  "size": 0,
+  "aggs": {
+    "my-agg-name": {
+      "terms": {
+        "field": "my-field"
+      }
+    }
+  }
+}
+
+"_Run multiple aggregations"
+GET /my-index-000001/_search
+{
+  "aggs": {
+    "my-first-agg-name": {
+      "terms": {
+        "field": "my-field"
+      }
+    },
+    "my-second-agg-name": {
+      "avg": {
+        "field": "my-other-field"
+      }
+    }
+  }
+}
+
+"_Run sub-aggregations"
+GET /my-index-000001/_search
+{
+  "aggs": {
+    "my-agg-name": {
+      "terms": {
+        "field": "my-field"
+      },
+      "aggs": {
+        "my-sub-agg-name": {
+          "avg": {
+            "field": "my-other-field"
+          }
+        }
+      }
+    }
+  }
+}
+
+"_Add custom metadata"
+GET /my-index-000001/_search
+{
+  "aggs": {
+    "my-agg-name": {
+      "terms": {
+        "field": "my-field"
+      },
+      "meta": {
+        "my-metadata-field": "foo"
+      }
+    }
+  }
+}
+
+"_Return the aggregation type"
+GET /my-index-000001/_search?typed_keys
+{
+  "aggs": {
+    "my-agg-name": {
+      "histogram": {
+        "field": "my-field",
+        "interval": 1000
+      }
+    }
+  }
+}
+
+"_Using scripts in an aggregation"
+GET /my-index-000001/_search?size=0
+{
+  "runtime_mappings": {
+    "message.length": {
+      "type": "long",
+      "script": "emit(doc['message.keyword'].value.length())"
+    }
+  },
+  "aggs": {
+    "message_length": {
+      "histogram": {
+        "interval": 10,
+        "field": "message.length"
+      }
+    }
+  }
+}
